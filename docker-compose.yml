@@ -1,6 +1,8 @@
 version: '3.8'
 
 services:
+
+# 1. The Main AI Engine
   ollama-server:
     image: ollama/ollama:latest
     container_name: ollama-service
@@ -9,6 +11,17 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-
+    
+ # 2. The Automator (Downloads the model, then exits)
+    model-puller:
+      image: ollama/ollama:latest
+      container_name: model-puller
+      depends_on:
+        - llm-server
+      environment:
+        - OLLAMA_HOST=llm-server:11434
+      # Docker injects the model name from the .env file here!
+      command: pull ${LLM_MODEL}
+      
 volumes:
   ollama_data:
