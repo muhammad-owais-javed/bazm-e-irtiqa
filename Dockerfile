@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run the orchestrator script
-CMD ["python", "orchestrator.py"]
+CMD ["python", "ping_test.py"]
