@@ -19,7 +19,7 @@ services:
     depends_on:
       - ollama-server
     environment:
-      - OLLAMA_HOST=llm-server:11434
+      - OLLAMA_HOST=ollama-server:11434
     # Docker injects the model name from the .env file here!
     command: pull ${LLM_MODEL}
       
