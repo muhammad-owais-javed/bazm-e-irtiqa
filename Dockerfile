@@ -1,6 +1,9 @@
 # Use a lightweight Python image
 FROM python:3.11-slim
 
+# Instruction for Python to print everything to the screen immediately
+ENV PYTHONUNBUFFERED=1
+
 # Set the working directory inside the container
 WORKDIR /app
 
