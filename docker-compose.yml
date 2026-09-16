@@ -23,5 +23,16 @@ services:
     # Docker injects the model name from the .env file here!
     command: pull ${LLM_MODEL}
       
+  # 3. The Multiagent Orchestrator 
+  orchestrator:
+    build: .
+    container_name: orchestrator-service
+    depends_on:
+      model-puller:
+        condition: service_completed_successfully
+    environment:
+      - LLM_MODEL=${LLM_MODEL}
+      - OLLAMA_BASE_URL=http://ollama-server:11434/v1
+
 volumes:
   ollama_data:
