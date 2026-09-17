@@ -4,6 +4,9 @@ FROM python:3.11-slim
 # Instruction for Python to print everything to the screen immediately
 ENV PYTHONUNBUFFERED=1
 
+# Root path
+ENV PYTHONPATH=/app  
+
 # Set the working directory inside the container
 WORKDIR /app
 
