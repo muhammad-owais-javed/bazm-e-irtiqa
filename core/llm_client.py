@@ -35,4 +35,4 @@ async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
     memory.append({"role": "assistant", "content": reply})
 
     print(f"✅ [{agent_name}] completed the task.")
-    return reply
+    return reply, memory
