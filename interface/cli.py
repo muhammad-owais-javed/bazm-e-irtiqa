@@ -1,65 +1,63 @@
 import asyncio
-from agents.frontend import frontend_agent
-from agents.database import database_agent
-from agents.backend import backend_agent
-from agents.qa import qa_agent
+import sys
+from agents.frontend import frontend_agent_stream
+from agents.database import database_agent_stream
+from agents.backend import backend_agent_stream
+from agents.qa import qa_agent_stream
 from core.llm_client import MODEL_NAME
 
+async def stream_to_console(generator):
+    """Helper function to print the stream to the terminal like a typewriter."""
+    full_text = ""
+    async for chunk in generator:
+        sys.stdout.write(chunk)
+        sys.stdout.flush()
+        full_text += chunk
+    print("\n") # Add a newline when finished
+    return full_text
+
 async def main():
-    print("\n🚀 Welcome to Bazm-e-Irtiqa Interactive Mode (Parallel + QA + Memory)!")
+    print("\n🚀 Welcome to Bazm-e-Irtiqa Interactive Mode (Streaming + QA)!")
     print(f"📦 Using Model: {MODEL_NAME}")
     
-    # Initialize empty memory for all four agents
-    fe_memory, db_memory, be_memory, qa_memory = None, None, None, None
+    # IMPORTANT: Initialize memory as empty lists so they can be updated in-place!
+    fe_memory, db_memory, be_memory, qa_memory = [], [], [], []
     
     while True:
-        print("\n" + "-"*50)
+        print("-" * 50)
         task = input("📝 Enter a task (or type 'exit'):\n> ")
         
         if task.lower() in ['exit', 'quit']:
-            print("Goodbye!")
             break
         if not task.strip():
             continue
 
-        # --- STEP 1: PARALLEL EXECUTION ---
-        print("\n🎨 Frontend & 🗄️ Database agents are working in parallel...")
-        results = await asyncio.gather(
-            frontend_agent(task, fe_memory),
-            database_agent(task, db_memory)
-        )
+        # --- SEQUENTIAL STREAMING ---
+        # We run them sequentially in the CLI so the text doesn't overlap on the screen
+        print("\n### 🎨 Frontend Agent")
+        ui_code = await stream_to_console(frontend_agent_stream(task, fe_memory))
         
-        # Safe unpacking
-        res_fe, res_db = results
-        ui_code, fe_memory = res_fe
-        db_schema, db_memory = res_db
+        print("### 🗄️ Database Agent")
+        db_schema = await stream_to_console(database_agent_stream(task, db_memory))
         
-        # --- STEP 2: SEQUENTIAL EXECUTION ---
-        print("⚙️ Backend Agent is building the server...")
-        server_code, be_memory = await backend_agent(ui_code, db_schema, be_memory)
+        print("### ⚙️ Backend Agent")
+        server_code = await stream_to_console(backend_agent_stream(ui_code, db_schema, be_memory))
         
-        # --- STEP 3: QA FEEDBACK LOOP ---
-        print("🕵️ QA Agent is reviewing the code...")
+        # --- QA LOOP ---
         max_retries = 2
-        
         for attempt in range(max_retries):
-            qa_feedback, qa_memory = await qa_agent(server_code, qa_memory)
+            print(f"### 🕵️ QA Agent (Attempt {attempt+1})")
+            qa_feedback = await stream_to_console(qa_agent_stream(server_code, qa_memory))
             
             if "PASS" in qa_feedback.upper():
-                print("✅ QA Passed! Code is ready.")
+                print("✅ QA Passed! Code is ready.\n")
                 break
             else:
-                print(f"⚠️ QA found issues (Attempt {attempt+1}/{max_retries}). Backend is fixing...")
-                
-                # Send the QA feedback back to the Backend Agent to fix!
+                print("⚠️ QA found issues. Backend is fixing...\n")
                 fix_prompt = f"The QA Agent found these issues. Please fix them and return ONLY the updated Python code:\n\n{qa_feedback}"
-                server_code, be_memory = await backend_agent("Keep previous HTML", fix_prompt, be_memory)
-        
-        # --- FINAL OUTPUT ---
-        print("\n" + "="*50)
-        print("🎉 FINAL COORDINATED OUTPUT 🎉")
-        print("="*50)
-        print(server_code)
+                
+                print("### ⚙️ Backend Agent (Fixing)")
+                server_code = await stream_to_console(backend_agent_stream("Keep previous HTML", fix_prompt, be_memory))
 
 if __name__ == "__main__":
     asyncio.run(main())
