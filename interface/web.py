@@ -10,10 +10,10 @@ st.set_page_config(page_title="Bazm-e-Irtiqa", page_icon="🤖", layout="centere
 
 # 1. Initialize Memory in Streamlit Session State
 if "fe_memory" not in st.session_state:
-    st.session_state.fe_memory = None
-    st.session_state.db_memory = None
-    st.session_state.be_memory = None
-    st.session_state.qa_memory = None
+    st.session_state.fe_memory = []
+    st.session_state.db_memory = []
+    st.session_state.be_memory = []
+    st.session_state.qa_memory = []
     st.session_state.chat_history = [] # Stores the UI chat logs
 
 st.title("🤖 Bazm-e-Irtiqa Factory")
