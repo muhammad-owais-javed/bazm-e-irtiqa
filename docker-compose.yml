@@ -34,5 +34,19 @@ services:
       - LLM_MODEL=${LLM_MODEL}
       - OLLAMA_BASE_URL=http://ollama-server:11434/v1
 
+  # 4. The Web Interface
+  web-ui:
+    build: .
+    container_name: bazm-web-ui
+    depends_on:
+      model-puller:
+        condition: service_completed_successfully
+    environment:
+      - LLM_MODEL=${LLM_MODEL}
+      - OLLAMA_BASE_URL=http://ollama-server:11434/v1
+    ports:
+      - "8501:8501" # Streamlit's default port
+    command: ["streamlit", "run", "interface/web.py", "--server.port=8501", "--server.address=0.0.0.0"]
+
 volumes:
   ollama_data:
