@@ -1,11 +1,10 @@
-from core.llm_client import async_ask_agent
+from core.llm_client import async_ask_agent_stream
 
-async def backend_agent(frontend_code, db_schema, memory=None):
+async def backend_agent_stream(frontend_code, db_schema, memory=None):
     system_prompt = """You are an expert Python Backend Developer. 
     Wrap the provided HTML and SQL schema into a Python Flask server.
-    Return ONLY the Python code."""
+    IMPORTANT: First, write your step-by-step plan inside <thinking> tags. 
+    Then, output the Python code inside a markdown code block."""
     
-    # Combine both parallel outputs into one prompt for the backend
     combined_prompt = f"Frontend HTML:\n{frontend_code}\n\nDatabase SQL:\n{db_schema}"
-    
-    return await async_ask_agent("Backend Agent", system_prompt, combined_prompt, memory)
+    return async_ask_agent_stream("Backend Agent", system_prompt, combined_prompt, memory)
