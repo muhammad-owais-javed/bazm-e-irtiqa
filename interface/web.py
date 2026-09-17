@@ -1,9 +1,9 @@
 import streamlit as st
 import asyncio
-from agents.frontend import frontend_agent
-from agents.database import database_agent
-from agents.backend import backend_agent
-from agents.qa import qa_agent
+from agents.frontend import frontend_agent_stream
+from agents.database import database_agent_stream
+from agents.backend import backend_agent_stream
+from agents.qa import qa_agent_stream
 from core.llm_client import MODEL_NAME
 
 st.set_page_config(page_title="Bazm-e-Irtiqa", page_icon="🤖", layout="centered")
@@ -37,51 +37,37 @@ if task := st.chat_input("📝 What would you like the agents to build or change
     with st.chat_message("assistant"):
         status_text = st.empty()
         
+    with st.chat_message("assistant"):
         async def run_workflow():
-            # --- STEP 1: PARALLEL EXECUTION ---
-            status_text.info("🎨 Frontend & 🗄️ Database agents are working in parallel...")
-            results = await asyncio.gather(
-                frontend_agent(task, st.session_state.fe_memory),
-                database_agent(task, st.session_state.db_memory)
-            )
+            # STEP 1: FRONTEND
+            st.markdown("### 🎨 Frontend Agent")
+            ui_code = await st.write_stream(frontend_agent_stream(task, st.session_state.fe_memory))
             
-            # SAFE UNPACKING: First split the two agent results, then unpack their memory
-            res_fe, res_db = results
-            ui_code, st.session_state.fe_memory = res_fe
-            db_schema, st.session_state.db_memory = res_db
+            # STEP 2: DATABASE
+            st.markdown("### 🗄️ Database Agent")
+            db_schema = await st.write_stream(database_agent_stream(task, st.session_state.db_memory))
             
-            with st.expander("🔍 View Parallel Outputs (HTML & SQL)"):
-                st.code(ui_code, language='html')
-                st.code(db_schema, language='sql')
-
-            # --- STEP 2: SEQUENTIAL EXECUTION ---
-            status_text.info("⚙️ Backend Agent is building the server...")
-            server_code, st.session_state.be_memory = await backend_agent(ui_code, db_schema, st.session_state.be_memory)
+            # STEP 3: BACKEND
+            st.markdown("### ⚙️ Backend Agent")
+            server_code = await st.write_stream(backend_agent_stream(ui_code, db_schema, st.session_state.be_memory))
             
-            # --- STEP 3: QA FEEDBACK LOOP ---
-            status_text.info("🕵️ QA Agent is reviewing the code...")
-            max_retries = 2 # Prevent infinite loops
-            
+            # STEP 4: QA LOOP
+            max_retries = 2
             for attempt in range(max_retries):
-                qa_feedback, st.session_state.qa_memory = await qa_agent(server_code, st.session_state.qa_memory)
+                st.markdown(f"### 🕵️ QA Agent (Attempt {attempt+1})")
+                qa_feedback = await st.write_stream(qa_agent_stream(server_code, st.session_state.qa_memory))
                 
                 if "PASS" in qa_feedback.upper():
-                    status_text.success("✅ QA Passed! Code is ready.")
+                    st.success("✅ QA Passed! Code is ready.")
                     break
                 else:
-                    status_text.warning(f"⚠️ QA found issues (Attempt {attempt+1}/{max_retries}). Backend is fixing...")
-                    with st.expander(f"🔍 QA Feedback (Attempt {attempt+1})"):
-                        st.write(qa_feedback)
-                    
-                    # Send the QA feedback back to the Backend Agent to fix!
+                    st.warning("⚠️ QA found issues. Backend is fixing...")
                     fix_prompt = f"The QA Agent found these issues. Please fix them and return ONLY the updated Python code:\n\n{qa_feedback}"
-                    server_code, st.session_state.be_memory = await backend_agent("Keep previous HTML", fix_prompt, st.session_state.be_memory)
+                    
+                    st.markdown("### ⚙️ Backend Agent (Fixing)")
+                    server_code = await st.write_stream(backend_agent_stream("Keep previous HTML", fix_prompt, st.session_state.be_memory))
             
             return server_code
 
-        # Run the async workflow inside Streamlit
         final_code = asyncio.run(run_workflow())
-        
-        # Save and display final output
-        st.session_state.chat_history.append({"role": "assistant", "content": f"```python\n{final_code}\n```"})
-        st.code(final_code, language='python')
+        st.session_state.chat_history.append({"role": "assistant", "content": final_code})
