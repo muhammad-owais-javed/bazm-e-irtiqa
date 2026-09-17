@@ -44,7 +44,11 @@ if task := st.chat_input("📝 What would you like the agents to build or change
                 frontend_agent(task, st.session_state.fe_memory),
                 database_agent(task, st.session_state.db_memory)
             )
-            (ui_code, st.session_state.fe_memory), (db_schema, st.session_state.db_memory) = results
+            
+            # SAFE UNPACKING: First split the two agent results, then unpack their memory
+            res_fe, res_db = results
+            ui_code, st.session_state.fe_memory = res_fe
+            db_schema, st.session_state.db_memory = res_db
             
             with st.expander("🔍 View Parallel Outputs (HTML & SQL)"):
                 st.code(ui_code, language='html')
