@@ -1,6 +1,6 @@
 from core.llm_client import async_ask_agent_stream
 
-async def backend_agent_stream(frontend_code, db_schema, memory=None):
+def backend_agent_stream(frontend_code, db_schema, memory=None):
     system_prompt = """You are an expert Python Backend Developer. 
     Wrap the provided HTML and SQL schema into a Python Flask server.
     IMPORTANT: First, write your step-by-step plan inside <thinking> tags. 

@@ -1,6 +1,6 @@
 from core.llm_client import async_ask_agent_stream
 
-async def qa_agent_stream(code_to_review, memory=None):
+def qa_agent_stream(code_to_review, memory=None):
     system_prompt = """You are an expert Quality Assurance (QA) Engineer.
     Review the provided Python code for syntax errors or bugs.
     IMPORTANT: First, write your step-by-step plan inside <thinking> tags. 
