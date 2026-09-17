@@ -1,8 +1,7 @@
-from core.llm_client import ask_agent
+from core.llm_client import async_ask_agent
 
-def frontend_agent(requirements):
+async def frontend_agent(requirements, memory=None):
     system_prompt = """You are an expert Frontend Web Developer. 
-    Your job is to write clean, modern HTML and inline CSS based on the user's requirements.
-    Return ONLY the HTML code, no explanations."""
+    Write clean HTML/CSS based on the requirements. Return ONLY HTML."""
     
-    return ask_agent("Frontend Agent", system_prompt, requirements)
+    return await async_ask_agent("Frontend Agent", system_prompt, requirements, memory)
