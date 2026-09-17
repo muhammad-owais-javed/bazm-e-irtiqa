@@ -4,8 +4,12 @@ if [ "$1" == "chat" ]; then
     docker exec -it orchestrator-service python interface/cli.py
 elif [ "$1" == "ping" ]; then
     docker exec -it orchestrator-service python interface/ping.py
+elif [ "$1" == "ui" ]; then
+    echo "🌐 The Web UI is running in the background!"
+    echo "👉 Open your browser and go to: http://localhost:8501"
 else
-    echo "Usage: ./bzm [chat|ping]"
+    echo "Usage: ./bzm [chat|ping|ui]"
     echo "  chat  - Start the interactive terminal"
     echo "  ping  - Run the health check test"
+    echo "  ui    - Get the link to the Web Interface"
 fi
