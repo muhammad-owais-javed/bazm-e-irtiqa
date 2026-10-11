@@ -18,7 +18,7 @@ async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
     response = await aclient.chat.completions.create(
         model=MODEL_NAME,
         messages=memory,
-        temperature=0.7
+        temperature=0.2
     )
     
     reply = response.choices[0].message.content
