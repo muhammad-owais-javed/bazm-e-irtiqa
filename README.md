@@ -36,7 +36,36 @@ _(Press `Ctrl+C` to exit the logs once the download is complete)._
 
 ### 4. Health Check & API Verification
 
-Once the model is downloaded, verify that the AI engine is responsive by sending a test curl request to the local API:
+Once the model is downloaded, verify that the AI engine is responsive by sending a test curl request to the local API.
+
+### Option A: Dynamic Test (Recommended)
+This command automatically reads the LLM_MODEL variable from the .env file, removing the need to manually update the model name:
+
+To test against currently downloaded and active model in Ollama, auto-detection can be performed using:
+```bash
+MODEL=$(grep '^LLM_MODEL=' .env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+```
+
+```bash
+curl http://localhost:11434/api/generate -d "{
+  \"model\": \"$MODEL\",
+  \"prompt\": \"In one short sentence, what is a multiagent system?\",
+  \"stream\": false
+}"
+```
+
+### Option B: Quick Static Test
+
+Alternatively, <your-model> can be replaced manually with the model name specified in the .env file (for example, phi3):
+
+``` bash
+curl http://localhost:11434/api/generate -d '{
+  "model": "<your-model>",
+  "prompt": "In one short sentence, what is a multiagent system?",
+  "stream": false
+}'
+```
+For example:
 
 ```Bash
 curl http://localhost:11434/api/generate -d '{
