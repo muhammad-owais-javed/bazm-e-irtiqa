@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-from metrics import start_agent_metrics_server, record_usage, track_latency, track_stream_latency
+from core.metrics import start_agent_metrics_server, record_usage, track_latency, track_stream_latency
 
 
 load_dotenv()
