@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-from metrics import start_agent_metrics_server, record_usage
+from metrics import start_agent_metrics_server, record_usage, track_latency
 
 
 load_dotenv()
@@ -11,6 +11,8 @@ OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1" )
 aclient = AsyncOpenAI(base_url=OLLAMA_URL, api_key="bazm-e-irtiqa-local")
 
 start_agent_metrics_server()
+
+@track_latency
 
 async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
     """Standard async function (No streaming)"""
@@ -25,7 +27,7 @@ async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
         temperature=0.2
     )
     
-    # Record tokens using the helper function
+    # Record tokens
     if response.usage:
         record_usage(
             agent_name, 
@@ -56,7 +58,7 @@ async def async_ask_agent_stream(agent_name, system_prompt, user_message, memory
     full_reply = ""
     async for chunk in response:
         
-    # Record stream tokens cleanly
+    # Record stream tokens
         if hasattr(chunk, 'usage') and chunk.usage is not None:
             record_usage(
                 agent_name,
@@ -69,5 +71,5 @@ async def async_ask_agent_stream(agent_name, system_prompt, user_message, memory
             full_reply += content
             yield content # Yield chunk to the interface
             
-    # Save the final combined reply to memory (No return statement needed!)
+    # Save the final combined reply to memory (No return statement needed)
     memory.append({"role": "assistant", "content": full_reply})
