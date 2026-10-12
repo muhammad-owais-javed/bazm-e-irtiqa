@@ -48,7 +48,6 @@ services:
       - "8501:8501" # Streamlit's default port
     command: ["streamlit", "run", "interface/web.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
-
 # 5. Metrics Time-Series Database
   prometheus:
     image: prom/prometheus:latest
@@ -71,5 +70,21 @@ services:
       - prometheus
     restart: unless-stopped
 
+  # 7. System Hardware Monitor (cAdvisor)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+
+
+
+    
 volumes:
   ollama_data:
