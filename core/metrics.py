@@ -14,7 +14,7 @@ AGENT_TTFT = Histogram('agent_ttft_seconds', 'Time to First Token (Streaming)', 
 
 def start_agent_metrics_server(port=8001):
     try:
-        start_http_server(port )
+        start_http_server(port, addr="0.0.0.0" )
         print(f"📊 Agent Metrics Server running on port {port}...")
     except OSError:
         pass
