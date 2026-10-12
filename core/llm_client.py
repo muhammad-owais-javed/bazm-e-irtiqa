@@ -1,12 +1,16 @@
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
+from metrics import start_agent_metrics_server, record_usage
+
 
 load_dotenv()
 MODEL_NAME = os.getenv("LLM_MODEL", "phi3") 
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1" )
 
 aclient = AsyncOpenAI(base_url=OLLAMA_URL, api_key="bazm-e-irtiqa-local")
+
+start_agent_metrics_server()
 
 async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
     """Standard async function (No streaming)"""
@@ -21,6 +25,15 @@ async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
         temperature=0.2
     )
     
+    # Record tokens using the helper function
+    if response.usage:
+        record_usage(
+            agent_name, 
+            response.usage.prompt_tokens, 
+            response.usage.completion_tokens
+        )
+        
+        
     reply = response.choices[0].message.content
     memory.append({"role": "assistant", "content": reply})
     return reply, memory
@@ -42,6 +55,15 @@ async def async_ask_agent_stream(agent_name, system_prompt, user_message, memory
     
     full_reply = ""
     async for chunk in response:
+        
+    # Record stream tokens cleanly
+        if hasattr(chunk, 'usage') and chunk.usage is not None:
+            record_usage(
+                agent_name,
+                chunk.usage.prompt_tokens,
+                chunk.usage.completion_tokens
+            )
+            
         if chunk.choices[0].delta.content is not None:
             content = chunk.choices[0].delta.content
             full_reply += content
