@@ -83,8 +83,21 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     restart: unless-stopped
 
+ # 6. AI Metrics Custom Exporter (Your own code!)
+  ai-metrics:
+    image: python:3.11-slim
+    container_name: ai-metrics
+    volumes:
+      - ./exporter.py:/app/exporter.py
+    # This command installs the requirements and runs your script automatically
+    command: >
+      bash -c "pip install prometheus_client requests && python /app/exporter.py"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama-server
+    restart: unless-stopped
 
 
-    
 volumes:
   ollama_data:
