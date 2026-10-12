@@ -5,6 +5,9 @@ from agents.database import database_agent_stream
 from agents.backend import backend_agent_stream
 from agents.qa import qa_agent_stream
 from core.llm_client import MODEL_NAME
+import nest_asyncio
+nest_asyncio.apply()
+
 
 st.set_page_config(page_title="Bazm-e-Irtiqa", page_icon="🤖", layout="centered")
 
@@ -41,7 +44,7 @@ if task := st.chat_input("📝 What would you like the agents to build or change
         async def run_workflow():
             # STEP 1: FRONTEND
             st.markdown("### 🎨 Frontend Agent")
-            ui_code = await st.write_stream(frontend_agent_stream(task, st.session_state.fe_memory))
+            ui_code = st.write_stream(frontend_agent_stream(task, st.session_state.fe_memory))
             
             # STEP 2: DATABASE
             st.markdown("### 🗄️ Database Agent")
