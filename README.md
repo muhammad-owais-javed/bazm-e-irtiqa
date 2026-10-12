@@ -2,6 +2,13 @@
 
 Bazm-e-Irtiqa is a containerized, open-source multi-agent orchestration engine. Designed for local execution, it isolates specialized AI agents and open-weight Large Language Models (LLMs) to preserve host system integrity while providing a predictable development environment.
 
+## Core Features
+
+- **Asynchronous Orchestration:** Utilizes Python's asyncio to execute non-dependent tasks concurrently (e.g., Frontend and Database agents working simultaneously) to optimize processing time.
+- **Chain of Thought (CoT) Streaming:** Agents expose their internal reasoning (<thinking> tags) token-by-token before generating code, providing complete transparency into the AI's decision-making process.
+- **Automated QA Feedback Loop:** A dedicated Quality Assurance agent reviews generated server code for syntax and logic errors. If issues are detected, it autonomously prompts the Backend agent for revisions before returning the final output.
+- **Ephemeral Session Memory:** Agents maintain context throughout an active session, allowing users to issue iterative follow-up instructions (e.g., "Update the previous HTML to use a dark theme") without restarting the pipeline.
+
 ## Quick Start Guide
 
 The core stack is containerized with Docker to ensure environment parity and reproducible execution.
