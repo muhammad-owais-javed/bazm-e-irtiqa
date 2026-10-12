@@ -127,3 +127,19 @@ Executes a static, pre-configured "Hello World" workflow to verify the end-to-en
 ```Bash
 ./bzm ping
 ```
+
+
+## Architecture Overview
+
+The system strictly adheres to the principle of separation of concerns, ensuring that agent logic, core infrastructure, and presentation layers remain decoupled.
+
+```text
+bazm-e-irtiqa/
+├── core/                  # LLM connection clients, async logic, and base configurations
+├── agents/                # Specialized role definitions and prompts (Frontend, Backend, DB, QA)
+├── interface/             # User interaction layers (CLI, Streamlit Web UI, Health checks)
+├── bzm                    # Bash wrapper for simplified Docker container interaction
+├── docker-compose.yml     # Multi-container infrastructure orchestration
+└── Dockerfile             # Python environment containerization configuration
+```
+
