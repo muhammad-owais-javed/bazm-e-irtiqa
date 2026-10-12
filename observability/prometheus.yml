@@ -2,7 +2,17 @@ global:
   scrape_interval: 5s # Interval for new metrics
 
 scrape_configs:
-  - job_name: 'ollama-engine'
+  # - job_name: 'ollama-engine'
+  #   static_configs:
+  #     # This points to existing LLM container
+  #     - targets: ['ollama-server:11434'] 
+
+    # Scrape cAdvisor for system/hardware metrics
+  - job_name: 'cadvisor'
     static_configs:
-      # This points to existing LLM container
-      - targets: ['ollama-server:11434'] 
+      - targets: ['cadvisor:8080']
+
+  # Scrape custom Python exporter
+  - job_name: 'ai-metrics'
+    static_configs:
+      - targets: ['ai-metrics:8000']
