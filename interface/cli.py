@@ -6,6 +6,9 @@ from agents.backend import backend_agent_stream
 from agents.qa import qa_agent_stream
 from core.llm_client import MODEL_NAME
 
+import nest_asyncio
+nest_asyncio.apply()
+
 async def stream_to_console(generator):
     """Helper function to print the stream to the terminal like a typewriter."""
     full_text = ""
