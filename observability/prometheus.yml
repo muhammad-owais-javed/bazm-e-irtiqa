@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s # Interval for new metrics
+
+scrape_configs:
+  - job_name: 'ollama-engine'
+    static_configs:
+      # This points to existing LLM container
+      - targets: ['ollama-server:11434'] 
