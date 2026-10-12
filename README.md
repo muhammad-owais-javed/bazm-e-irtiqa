@@ -8,6 +8,7 @@ Bazm-e-Irtiqa is a containerized, open-source multi-agent orchestration engine. 
 - **Chain of Thought (CoT) Streaming:** Agents expose their internal reasoning (<thinking> tags) token-by-token before generating code, providing complete transparency into the AI's decision-making process.
 - **Automated QA Feedback Loop:** A dedicated Quality Assurance agent reviews generated server code for syntax and logic errors. If issues are detected, it autonomously prompts the Backend agent for revisions before returning the final output.
 - **Ephemeral Session Memory:** Agents maintain context throughout an active session, allowing users to issue iterative follow-up instructions (e.g., "Update the previous HTML to use a dark theme") without restarting the pipeline.
+- **Enterprise Observability:** Fully instrumented telemetry stack using Prometheus and Grafana. It includes a custom Python exporter (`ai-metrics`) and `cAdvisor` to track real-time LLM token generation, agent execution times, and container hardware utilization.
 
 ## Quick Start Guide
 
@@ -128,6 +129,14 @@ Executes a static, pre-configured "Hello World" workflow to verify the end-to-en
 ./bzm ping
 ```
 
+### 6. Observability & Metrics (Grafana)
+Bazm-e-Irtiqa includes monitoring tools **(Prometheus & Grafana)** to track AI performance and system health.
+
+1. Navigate to **http://localhost:3000** in browser.
+2. Log in using the default credentials (Username: `admin`, Password: `admin` or the `.env` configured password ).
+3. Navigate to **Dashboards > Import**.
+4. Upload the provided template located at `observability/dashboard-template.json`.
+5. The system now displays live Token Generation Speed, Agent Execution Latency, and hardware CPU/RAM usage.
 
 ## Architecture Overview
 
@@ -139,6 +148,7 @@ bazm-e-irtiqa/
 ├── agents/                # Specialized role definitions and prompts (Frontend, Backend, DB, QA)
 ├── interface/             # User interaction layers (CLI, Streamlit Web UI, Health checks)
 ├── bzm                    # Bash wrapper for simplified Docker container interaction
+├── observability/         # Prometheus configurations and Grafana dashboard templates
 ├── docker-compose.yml     # Multi-container infrastructure orchestration
 └── Dockerfile             # Python environment containerization configuration
 ```
