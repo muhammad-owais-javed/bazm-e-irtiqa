@@ -49,27 +49,27 @@ services:
     command: ["streamlit", "run", "interface/web.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
 
-  # 5. Metrics Time-Series Database
-    prometheus:
-      image: prom/prometheus:latest
-      container_name: prometheus-service
-      volumes:
-        - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
-      ports:
-        - "9090:9090"
-      restart: unless-stopped
+# 5. Metrics Time-Series Database
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-service
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
 
-    # 6. Observability Dashboard
-    grafana:
-      image: grafana/grafana:latest
-      container_name: grafana-service
-      ports:
-        - "3000:3000"
-      environment:
-        - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      depends_on:
-        - prometheus
-      restart: unless-stopped
+  # 6. Observability Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-service
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    depends_on:
+      - prometheus
+    restart: unless-stopped
 
 volumes:
   ollama_data:
