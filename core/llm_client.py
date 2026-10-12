@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
-from metrics import start_agent_metrics_server, record_usage, track_latency
+from metrics import start_agent_metrics_server, record_usage, track_latency, track_stream_latency
 
 
 load_dotenv()
@@ -39,6 +39,8 @@ async def async_ask_agent(agent_name, system_prompt, user_message, memory=None):
     reply = response.choices[0].message.content
     memory.append({"role": "assistant", "content": reply})
     return reply, memory
+
+@track_stream_latency
 
 async def async_ask_agent_stream(agent_name, system_prompt, user_message, memory):
     """New Streaming function for the UI and CLI"""
