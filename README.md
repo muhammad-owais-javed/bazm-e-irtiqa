@@ -93,3 +93,37 @@ A successful request returns an HTTP 200 with a JSON payload confirming executio
   "done": true
 }
 ```
+
+### 5. Start the Multi-Agent Factory
+Bazm-e-Irtiqa utilizes a unified wrapper script (bzm) to abstract the underlying Docker execution commands.
+
+First, ensure the script is executable:
+
+```Bash
+chmod +x bzm
+```
+The orchestration engine can be interacted with using three primary interfaces:
+
+#### A. Web User Interface (Recommended)
+Launches a rich, browser-based interface powered by Streamlit. It features real-time text streaming, visual separation of agent tasks, and collapsible code blocks.
+
+```Bash
+./bzm ui
+```
+Once running, navigate to http://localhost:8501 in your web browser.
+
+#### B. Interactive Terminal (CLI )
+
+A lightweight, terminal-based chat interface. It streams agent thought processes and generated code directly to standard output (stdout).
+
+```Bash
+./bzm chat
+```
+
+#### C. Automated Ping Test
+
+Executes a static, pre-configured "Hello World" workflow to verify the end-to-end agent pipeline (Frontend -> Database -> Backend) without requiring manual input.
+
+```Bash
+./bzm ping
+```
