@@ -9,6 +9,9 @@ Bazm-e-Irtiqa is a containerized, open-source multi-agent orchestration engine. 
 - **Automated QA Feedback Loop:** A dedicated Quality Assurance agent reviews generated server code for syntax and logic errors. If issues are detected, it autonomously prompts the Backend agent for revisions before returning the final output.
 - **Ephemeral Session Memory:** Agents maintain context throughout an active session, allowing users to issue iterative follow-up instructions (e.g., "Update the previous HTML to use a dark theme") without restarting the pipeline.
 - **Enterprise Observability:** Fully instrumented telemetry stack using Prometheus and Grafana. It includes a custom Python exporter (`ai-metrics`) and `cAdvisor` to track real-time LLM token generation, agent execution times, and container hardware utilization.
+- **Intelligent Task Routing:** A Manager Agent acts as the orchestrator's brain, dynamically routing user prompts to simple chat interfaces or spinning up the full multi-agent factory only when complex software generation is required.
+- **Visual Execution Sandbox (Computer Use):** The system features a Docker-in-Docker (DinD) sandbox utilizing noVNC. Agents autonomously inject generated code into an isolated Ubuntu container, install dependencies, execute the server, and launch a GUI web browser (Midori) so users can watch the AI test its own code in real-time.
+- **Artifact Management:** Upon successful execution and QA approval, the system packages the raw HTML, SQL, and Python files into downloadable artifacts directly from the web interface.
 
 ## Quick Start Guide
 
@@ -149,6 +152,7 @@ bazm-e-irtiqa/
 ├── interface/             # User interaction layers (CLI, Streamlit Web UI, Health checks)
 ├── bzm                    # Bash wrapper for simplified Docker container interaction
 ├── observability/         # Prometheus configurations and Grafana dashboard templates
+├── exporter.py            # Custom Python metrics exporter for telemetry
 ├── docker-compose.yml     # Multi-container infrastructure orchestration
 └── Dockerfile             # Python environment containerization configuration
 ```
